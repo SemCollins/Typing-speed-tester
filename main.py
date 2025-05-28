@@ -33,10 +33,13 @@ class TypingSpeedTester:
         self.root.resizable(False, False)
 
         self.level = 1
+        self.highest_score = 0
+        self.highest_level = 1
         self.time_limit = 60
         self.remaining_time = self.time_limit
         self.start_time = None
         self.current_text = random.choice(sample_texts)
+        self.timer_running = False
 
         try:
             bg_image = Image.open("i/background.png").resize((1000, 750))
@@ -88,6 +91,9 @@ class TypingSpeedTester:
         self.help_button = ctk.CTkButton(button_frame, text="Help", command=self.show_help, text_color="black")
         self.help_button.grid(row=0, column=2, padx=10)
 
+        self.stats_button = ctk.CTkButton(button_frame, text="Stats", command=self.show_stats, text_color="black")
+        self.stats_button.grid(row=0, column=3, padx=10)
+
     def show_help(self):
         help_popup = ctk.CTkToplevel(self.root)
         help_popup.title("How to Use")
@@ -107,14 +113,35 @@ class TypingSpeedTester:
         ctk.CTkLabel(help_popup, text=help_text, font=("Segoe UI", 14), justify="left", wraplength=450).pack(padx=20, pady=20)
         ctk.CTkButton(help_popup, text="OK", command=help_popup.destroy, text_color="black").pack(pady=10)
 
+    def show_stats(self):
+        stats_popup = ctk.CTkToplevel(self.root)
+        stats_popup.title("Your Stats")
+        stats_popup.geometry("500x300")
+        stats_popup.transient(self.root)
+        stats_popup.grab_set()
+        stats_popup.resizable(False, False)
+
+        try:
+            bg = Image.open("i/cat.py").resize((500, 300))
+            bg_photo = ImageTk.PhotoImage(bg)
+            bg_label = ctk.CTkLabel(stats_popup, image=bg_photo, text="")
+            bg_label.image = bg_photo
+            bg_label.place(x=0, y=0, relwidth=1, relheight=1)
+        except Exception:
+            print("Stats background image not found or not valid.")
+
+        ctk.CTkLabel(stats_popup, text=f"Highest Score: {self.highest_score}\nHighest Level: {self.highest_level}", font=("Segoe UI", 16)).pack(pady=40)
+        ctk.CTkButton(stats_popup, text="Close", command=stats_popup.destroy, text_color="black").pack(pady=10)
+
     def start_typing(self, event):
         if self.start_time is None:
             self.start_time = time.time()
             self.remaining_time = self.time_limit
+            self.timer_running = True
             self.update_countdown()
 
     def update_countdown(self):
-        if self.remaining_time > 0:
+        if self.remaining_time > 0 and self.timer_running:
             if self.remaining_time > 30:
                 self.text_display.configure(text_color="green")
             elif self.remaining_time > 10:
@@ -125,7 +152,8 @@ class TypingSpeedTester:
             self.countdown_label.configure(text=f"Time Remaining: {self.remaining_time}s")
             self.remaining_time -= 1
             self.root.after(1000, self.update_countdown)
-        else:
+        elif self.timer_running:
+            self.timer_running = False
             self.time_up_popup()
 
     def handle_enter_key(self, event):
@@ -137,6 +165,7 @@ class TypingSpeedTester:
             messagebox.showwarning("Warning", "Start typing to begin the test!")
             return
 
+        self.timer_running = False
         end_time = time.time()
         elapsed_time = end_time - self.start_time
         user_input = self.typing_input.get("1.0", "end").strip()
@@ -146,6 +175,12 @@ class TypingSpeedTester:
         score = round((speed + accuracy) / 2)
 
         self.result_label.configure(text=f"Speed: {speed:.2f} WPM | Accuracy: {accuracy:.2f}% | Time: {elapsed_time:.2f}s | Score: {score}")
+
+        if score > self.highest_score:
+            self.highest_score = score
+
+        if self.level > self.highest_level:
+            self.highest_level = self.level
 
         if elapsed_time <= self.time_limit and accuracy >= 85:
             self.show_congratulations(speed, accuracy, score)
@@ -194,6 +229,7 @@ class TypingSpeedTester:
     def reset_test(self):
         self.start_time = None
         self.remaining_time = self.time_limit
+        self.timer_running = False
         self.current_text = random.choice(sample_texts)
         self.text_display.configure(text=self.current_text, text_color="green")
         self.typing_input.delete("1.0", "end")
