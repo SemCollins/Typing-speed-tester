@@ -1,6 +1,6 @@
 import customtkinter as ctk
-from tkinter import messagebox, Toplevel
-from PIL import Image, ImageTk
+from tkinter import messagebox
+from PIL import Image
 import time
 import random
 
@@ -46,10 +46,9 @@ class TypingSpeedTester:
 
     def set_main_background(self):
         try:
-            bg_image = Image.open("i/background.png")
-            bg_photo = ImageTk.PhotoImage(bg_image.resize((1000, 750)))
-            bg_label = ctk.CTkLabel(self.root, image=bg_photo, text="")
-            bg_label.image = bg_photo
+            bg_image = ctk.CTkImage(Image.open("i/background.png"), size=(1000, 750))
+            bg_label = ctk.CTkLabel(self.root, image=bg_image, text="")
+            bg_label.image = bg_image
             bg_label.place(x=0, y=0, relwidth=1, relheight=1)
         except FileNotFoundError:
             print("Main background image not found.")
@@ -58,9 +57,8 @@ class TypingSpeedTester:
         self.update_background()
 
         try:
-            logo = Image.open("i/coyote.png").resize((100, 100))
-            self.logo_photo = ImageTk.PhotoImage(logo)
-            ctk.CTkLabel(self.root, image=self.logo_photo, text="").place(x=30, y=30)
+            logo_image = ctk.CTkImage(Image.open("i/coyote.png"), size=(100, 100))
+            ctk.CTkLabel(self.root, image=logo_image, text="").place(x=30, y=30)
         except FileNotFoundError:
             print("Logo image not found.")
 
@@ -101,11 +99,11 @@ class TypingSpeedTester:
 
     def update_background(self):
         if self.level >= 15:
-            self.root.configure(bg="#2f2f2f")  # darker
+            self.root.configure(bg="#2f2f2f")
         elif self.level >= 10:
-            self.root.configure(bg="#404040")  # medium
+            self.root.configure(bg="#404040")
         else:
-            self.root.configure(bg="#1f1f1f")  # original dark
+            self.root.configure(bg="#1f1f1f")
 
     def show_help(self):
         help_popup = ctk.CTkToplevel(self.root)
@@ -116,10 +114,9 @@ class TypingSpeedTester:
         help_popup.resizable(False, False)
 
         try:
-            bg = Image.open("i/cat.png").resize((500, 300))
-            bg_photo = ImageTk.PhotoImage(bg)
-            bg_label = ctk.CTkLabel(help_popup, image=bg_photo, text="")
-            bg_label.image = bg_photo
+            bg_image = ctk.CTkImage(Image.open("i/cat.png"), size=(500, 300))
+            bg_label = ctk.CTkLabel(help_popup, image=bg_image, text="")
+            bg_label.image = bg_image
             bg_label.place(x=0, y=0, relwidth=1, relheight=1)
         except FileNotFoundError:
             print("Help popup background image not found.")
@@ -144,10 +141,9 @@ class TypingSpeedTester:
         stats_popup.resizable(False, False)
 
         try:
-            bg = Image.open("i/cat.png").resize((500, 300))
-            bg_photo = ImageTk.PhotoImage(bg)
-            bg_label = ctk.CTkLabel(stats_popup, image=bg_photo, text="")
-            bg_label.image = bg_photo
+            bg_image = ctk.CTkImage(Image.open("i/cat.png"), size=(500, 300))
+            bg_label = ctk.CTkLabel(stats_popup, image=bg_image, text="")
+            bg_label.image = bg_image
             bg_label.place(x=0, y=0, relwidth=1, relheight=1)
         except FileNotFoundError:
             print("Stats popup background image not found.")
@@ -233,10 +229,9 @@ class TypingSpeedTester:
         top.resizable(False, False)
 
         try:
-            bg = Image.open("i/beauty.png").resize((500, 300))
-            bg_photo = ImageTk.PhotoImage(bg)
-            bg_label = ctk.CTkLabel(top, image=bg_photo, text="")
-            bg_label.image = bg_photo
+            bg_image = ctk.CTkImage(Image.open("i/beauty.png"), size=(500, 300))
+            bg_label = ctk.CTkLabel(top, image=bg_image, text="")
+            bg_label.image = bg_image
             bg_label.place(x=0, y=0, relwidth=1, relheight=1)
         except FileNotFoundError:
             print("Popup background image not found.")
