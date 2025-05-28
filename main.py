@@ -41,17 +41,11 @@ class TypingSpeedTester:
         self.current_text = random.choice(sample_texts)
         self.timer_running = False
 
-        try:
-            bg_image = Image.open("i/background.png").resize((1000, 750))
-            self.bg_photo = ImageTk.PhotoImage(bg_image)
-            self.bg_label = ctk.CTkLabel(self.root, image=self.bg_photo, text="")
-            self.bg_label.place(x=0, y=0, relwidth=1, relheight=1)
-        except FileNotFoundError:
-            print("Background image not found.")
-
         self.create_widgets()
 
     def create_widgets(self):
+        self.update_background()
+
         try:
             logo = Image.open("i/coyote.png").resize((100, 100))
             self.logo_photo = ImageTk.PhotoImage(logo)
@@ -94,6 +88,14 @@ class TypingSpeedTester:
         self.stats_button = ctk.CTkButton(button_frame, text="Stats", command=self.show_stats, text_color="black")
         self.stats_button.grid(row=0, column=3, padx=10)
 
+    def update_background(self):
+        if self.level >= 15:
+            self.root.configure(bg="#2f2f2f")  # darker
+        elif self.level >= 10:
+            self.root.configure(bg="#404040")  # medium
+        else:
+            self.root.configure(bg="#1f1f1f")  # original dark
+
     def show_help(self):
         help_popup = ctk.CTkToplevel(self.root)
         help_popup.title("How to Use")
@@ -120,15 +122,6 @@ class TypingSpeedTester:
         stats_popup.transient(self.root)
         stats_popup.grab_set()
         stats_popup.resizable(False, False)
-
-        try:
-            bg = Image.open("i/cat.py").resize((500, 300))
-            bg_photo = ImageTk.PhotoImage(bg)
-            bg_label = ctk.CTkLabel(stats_popup, image=bg_photo, text="")
-            bg_label.image = bg_photo
-            bg_label.place(x=0, y=0, relwidth=1, relheight=1)
-        except Exception:
-            print("Stats background image not found or not valid.")
 
         ctk.CTkLabel(stats_popup, text=f"Highest Score: {self.highest_score}\nHighest Level: {self.highest_level}", font=("Segoe UI", 16)).pack(pady=40)
         ctk.CTkButton(stats_popup, text="Close", command=stats_popup.destroy, text_color="black").pack(pady=10)
@@ -172,7 +165,7 @@ class TypingSpeedTester:
         word_count = len(user_input.split())
         accuracy = self.calculate_accuracy(user_input, self.current_text)
         speed = word_count / (elapsed_time / 60)
-        score = round((speed + accuracy) / 2)
+        score = round(((accuracy + speed) / 130) * 100)
 
         self.result_label.configure(text=f"Speed: {speed:.2f} WPM | Accuracy: {accuracy:.2f}% | Time: {elapsed_time:.2f}s | Score: {score}")
 
@@ -183,10 +176,13 @@ class TypingSpeedTester:
             self.highest_level = self.level
 
         if elapsed_time <= self.time_limit and accuracy >= 85:
-            self.show_congratulations(speed, accuracy, score)
-            self.level += 1
-            self.time_limit = max(self.time_limit - 5, 20)
-            self.reset_test()
+            if self.level < 20:
+                self.show_congratulations(speed, accuracy, score)
+                self.level += 1
+                self.time_limit = max(self.time_limit - 2, 20)
+                self.reset_test()
+            else:
+                messagebox.showinfo("🎉 Congratulations!", "You've completed all 20 levels! 🏁")
 
     def time_up_popup(self):
         popup = ctk.CTkToplevel(self.root)
@@ -231,6 +227,7 @@ class TypingSpeedTester:
         self.remaining_time = self.time_limit
         self.timer_running = False
         self.current_text = random.choice(sample_texts)
+        self.update_background()
         self.text_display.configure(text=self.current_text, text_color="green")
         self.typing_input.delete("1.0", "end")
         self.result_label.configure(text="")
