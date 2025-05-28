@@ -41,7 +41,18 @@ class TypingSpeedTester:
         self.current_text = random.choice(sample_texts)
         self.timer_running = False
 
+        self.set_main_background()
         self.create_widgets()
+
+    def set_main_background(self):
+        try:
+            bg_image = Image.open("i/background.png")
+            bg_photo = ImageTk.PhotoImage(bg_image.resize((1000, 750)))
+            bg_label = ctk.CTkLabel(self.root, image=bg_photo, text="")
+            bg_label.image = bg_photo
+            bg_label.place(x=0, y=0, relwidth=1, relheight=1)
+        except FileNotFoundError:
+            print("Main background image not found.")
 
     def create_widgets(self):
         self.update_background()
@@ -104,6 +115,15 @@ class TypingSpeedTester:
         help_popup.grab_set()
         help_popup.resizable(False, False)
 
+        try:
+            bg = Image.open("i/cat.png").resize((500, 300))
+            bg_photo = ImageTk.PhotoImage(bg)
+            bg_label = ctk.CTkLabel(help_popup, image=bg_photo, text="")
+            bg_label.image = bg_photo
+            bg_label.place(x=0, y=0, relwidth=1, relheight=1)
+        except FileNotFoundError:
+            print("Help popup background image not found.")
+
         help_text = (
             "1. Read the sentence displayed.\n"
             "2. Start typing in the input box.\n"
@@ -122,6 +142,15 @@ class TypingSpeedTester:
         stats_popup.transient(self.root)
         stats_popup.grab_set()
         stats_popup.resizable(False, False)
+
+        try:
+            bg = Image.open("i/cat.png").resize((500, 300))
+            bg_photo = ImageTk.PhotoImage(bg)
+            bg_label = ctk.CTkLabel(stats_popup, image=bg_photo, text="")
+            bg_label.image = bg_photo
+            bg_label.place(x=0, y=0, relwidth=1, relheight=1)
+        except FileNotFoundError:
+            print("Stats popup background image not found.")
 
         ctk.CTkLabel(stats_popup, text=f"Highest Score: {self.highest_score}\nHighest Level: {self.highest_level}", font=("Segoe UI", 16)).pack(pady=40)
         ctk.CTkButton(stats_popup, text="Close", command=stats_popup.destroy, text_color="black").pack(pady=10)
